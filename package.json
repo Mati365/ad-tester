@@ -1,0 +1,30 @@
+{
+  "name": "ad-tester",
+  "version": "1.0.0",
+  "description": "Simple browser extension that helps with live debugging frame ads",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "parcel serve src/panel.html -d build/",
+    "build": "cross-env NODE_ENV=production parcel build src/panel.html -d build/"
+  },
+  "author": "Mateusz Bagiński",
+  "license": "MIT",
+  "dependencies": {
+    "ramda": "^0.25.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1"
+  },
+  "devDependencies": {
+    "@types/ramda": "^0.25.33",
+    "@types/react": "^16.3.18",
+    "@types/react-dom": "^16.0.6",
+    "cross-env": "^5.2.0",
+    "parcel-bundler": "^1.9.1",
+    "parcel-plugin-typescript": "^1.0.0",
+    "tslint": "^5.10.0",
+    "tslint-config-airbnb": "^5.9.2",
+    "tslint-config-prettier": "^1.13.0",
+    "tslint-react": "^3.6.0",
+    "typescript": "^2.9.2"
+  }
+}
