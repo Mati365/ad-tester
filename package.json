@@ -4,27 +4,30 @@
   "description": "Simple browser extension that helps with live debugging frame ads",
   "main": "src/index.js",
   "scripts": {
-    "start": "parcel serve src/panel.html -d build/",
-    "build": "cross-env NODE_ENV=production parcel build src/panel.html -d build/"
+    "build:prod": "webpack --config ./config/webpack/config.prod.js",
+    "build:dev": "webpack --config ./config/webpack/config.dev.js"
   },
   "author": "Mateusz Bagiński",
   "license": "MIT",
   "dependencies": {
+    "eslint-config-airbnb": "^17.0.0",
     "ramda": "^0.25.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1"
   },
   "devDependencies": {
-    "@types/ramda": "^0.25.33",
-    "@types/react": "^16.3.18",
-    "@types/react-dom": "^16.0.6",
-    "cross-env": "^5.2.0",
-    "parcel-bundler": "^1.9.1",
-    "parcel-plugin-typescript": "^1.0.0",
-    "tslint": "^5.10.0",
-    "tslint-config-airbnb": "^5.9.2",
-    "tslint-config-prettier": "^1.13.0",
-    "tslint-react": "^3.6.0",
-    "typescript": "^2.9.2"
+    "@babel/core": "^7.0.0-beta.51",
+    "@babel/preset-env": "^7.0.0-beta.51",
+    "@babel/preset-react": "^7.0.0-beta.51",
+    "babel-loader": "^8.0.0-beta.4",
+    "clean-webpack-plugin": "^0.1.19",
+    "eslint": "^5.0.0",
+    "eslint-import-resolver-webpack": "^0.10.0",
+    "eslint-loader": "^2.0.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.9.1",
+    "webpack": "^4.12.0",
+    "webpack-cli": "^3.0.8"
   }
 }

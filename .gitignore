@@ -68,3 +68,4 @@ typings/
 
 .*
 !.gitignore
+!.eslintrc.json

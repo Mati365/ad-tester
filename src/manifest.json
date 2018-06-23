@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+  "name": "ads-tester",
+  "version": "1.0.0",
+  "default_locale": "en",
+  "description": "Simple browser extension that helps with live debugging frame ads",
+  "icons": {
+    "16": "resources/icons/icon.svg",
+    "48": "resources/icons/icon.svg"
+  },
+  "author": "Mateusz Bagiński <cziken58@gmail.com>",
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*",
+        "https://*"
+      ],
+      "js": ["content.js"]
+    }
+  ],
+  "homepage_url": "https://github.com/Mati365/ad-tester",
+  "permissions": [
+    "tabs",
+    "activeTab"
+  ]
+}

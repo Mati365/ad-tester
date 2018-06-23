@@ -1,0 +1,19 @@
+{
+  "extends": "airbnb",
+  "env": {
+    "es6": true,
+    "browser": true
+  },
+  "settings": {
+    "import/resolver": {
+      "webpack": {
+        "config": "./config/webpack/config.dev.js"
+      }
+    }
+  },
+  "rules": {
+    "object-curly-spacing": ["error", "never"],
+    "curly": ["error", "multi-or-nest"],
+    "nonblock-statement-body-position": 0
+  }
+}

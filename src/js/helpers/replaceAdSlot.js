@@ -1,23 +1,21 @@
+import * as R from 'ramda';
+
 const CACHE_SELECTOR_KEY = 'data-cached-slot-selector';
 
 /**
  * @param {string}  tag
  * @param {object}  string
  */
-const createElement = (
-  tag: string,
-  styles?: {[key: string]: any},
-  attributes?: {[key: string]: any}
-): HTMLElement => {
+const createElement = (tag, styles, attributes) => {
   const frame = document.createElement(tag);
   if (styles)
     Object.assign(frame.style, styles);
 
   if (attributes) {
-    for (let key in attributes) {
-      if (attributes.hasOwnProperty(key))
-        frame.setAttribute(key, attributes[key]);
-    }
+    R.forEach(
+      (key, attribute) => frame.setAttribute(key, attribute),
+      attributes,
+    );
   }
   return frame;
 };
@@ -27,7 +25,7 @@ const createElement = (
  *
  * @param {string}  selector
  */
-const searchSlot = (selector: string): HTMLElement | null => (
+const searchSlot = selector => (
   document.querySelector(selector)
     || document.querySelector(`[${CACHE_SELECTOR_KEY}="${selector}"]`)
 );
@@ -42,11 +40,7 @@ const searchSlot = (selector: string): HTMLElement | null => (
  * @param {string}  code
  * @param {object}  styles
  */
-const replaceAdSlot = (
-  selector: string,
-  code: string,
-  styles?: object
-): boolean => {
+const replaceAdSlot = (selector, code, styles) => {
   const element = searchSlot(selector);
   if (!element)
     return false;
