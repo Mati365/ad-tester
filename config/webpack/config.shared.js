@@ -1,5 +1,6 @@
 const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const getSharedConfig = () => ({
   entry: {
@@ -25,6 +26,14 @@ const getSharedConfig = () => ({
       verbose: true,
       dry: false,
     }),
+
+    new CopyWebpackPlugin(
+      [{
+        from: path.resolve('./extension'),
+        to: path.resolve('./build'),
+        ignore: ['src/**/*'],
+      }],
+    ),
   ],
   module: {
     rules: [
