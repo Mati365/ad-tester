@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+import cacheCall from './helpers/cacheCall';
 
 const isBackgroundScript = R.is(
   Function,
@@ -16,7 +17,7 @@ const Backend = {
     // if its backend, register all listeners without patch function
     // it will watch for events from front
     if (isBackgroundScript) {
-      this.actions[name] = fn;
+      this.actions[name] = cacheCall(fn);
       return fn;
     }
     // if its front, patch function to pass function to backend
@@ -51,7 +52,7 @@ if (isBackgroundScript) {
         return;
 
       sendResponse({
-        data: backendAction(...request.args),
+        data: backendAction(sender.tab.id, ...request.args),
       });
     },
   );
@@ -63,13 +64,23 @@ if (isBackgroundScript) {
  * @param {string} backgroundFnName
  */
 const linkBackendMethod = backgroundFnName => (
-  Backend.registerAction(backgroundFnName, (...args) => {
-    const fn = chrome.browserAction[backgroundFnName];
-    if (!fn)
-      return null;
+  Backend.registerAction(
+    backgroundFnName,
+    (tabId, ...args) => {
+      const fn = chrome.browserAction[backgroundFnName];
+      if (!fn)
+        return null;
 
-    return fn.bind(chrome.browserAction)(...args);
-  })
+      const [data, ...optArgs] = args;
+      return fn.bind(chrome.browserAction)(
+        {
+          ...data,
+          tabId,
+        },
+        ...optArgs,
+      );
+    },
+  )
 );
 
 /**
@@ -78,7 +89,10 @@ const linkBackendMethod = backgroundFnName => (
 export const setBadgeText = R.compose(
   linkBackendMethod('setBadgeText'),
   R.objOf('text'),
-  R.toString,
+  R.unless(
+    R.is(String),
+    R.toString,
+  ),
 );
 
 export const setBadgeBackgroundColor = R.compose(

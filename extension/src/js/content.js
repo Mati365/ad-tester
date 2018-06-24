@@ -1,27 +1,43 @@
 import * as R from 'ramda';
 
 import listAdFrames from './helpers/listAdFrames';
+import addFrameLayer from './helpers/addFrameLayer';
+
 import * as backend from './background';
 
-backend.setBadgeBackgroundColor('red');
-
-/**
- * Displays frames count in badge, if badge > 10 displays '10+'
- * @param {Array} frames
- */
-const setFramesInfoBadge = R.compose(
-  backend.setBadgeText,
+const formatFramesArray = R.compose(
   R.cond([
-    [R.lt(10), R.always('10+')],
+    [R.equals(0), R.always('')],
+    [R.lt(99), R.always('99+')],
     [R.T, R.identity],
   ]),
   R.length,
 );
 
-setInterval(
-  () => {
-    const frames = listAdFrames();
-    console.log(setFramesInfoBadge(frames));
-  },
-  2000,
-);
+/**
+ * Displays frames count in badge
+ *
+ * @param {Array} frames
+ */
+const setFramesInfoBadge = async (frames) => {
+  await backend.setBadgeBackgroundColor('red');
+  return backend.setBadgeText(
+    formatFramesArray(frames),
+  );
+};
+
+/**
+ * Lists all ad frames on page
+ */
+const updateFramesMiddleware = () => {
+  const frames = listAdFrames();
+  setFramesInfoBadge(frames);
+
+  R.forEach(
+    addFrameLayer,
+    frames,
+  );
+};
+
+setInterval(updateFramesMiddleware, 2000);
+updateFramesMiddleware();

@@ -1,5 +1,6 @@
 {
   "extends": "airbnb",
+  "parser": "babel-eslint",
   "env": {
     "es6": true,
     "browser": true,
@@ -15,6 +16,9 @@
   "rules": {
     "object-curly-spacing": ["error", "never"],
     "curly": ["error", "multi-or-nest"],
-    "nonblock-statement-body-position": 0
+    "import/no-named-as-default": 0,
+    "nonblock-statement-body-position": 0,
+    "react/destructuring-assignment": 0,
+    "react/prop-types": 0
   }
 }

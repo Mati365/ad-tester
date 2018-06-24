@@ -2,5 +2,7 @@
   "appName": {
     "message": "Ads Tester",
     "description": "Simple tool to local test ads before publish"
-  }
+  },
+  "ad_creation_dimensions": {"message": "AD dimensions:"},
+  "edit_ad": {"message": "Click to change AD content"}
 }
