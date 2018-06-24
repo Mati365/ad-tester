@@ -3,13 +3,13 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 
 const getSharedConfig = () => ({
   entry: {
-    popup: './src/js/popup.js',
-    content: './src/js/content.js'
+    popup: './extension/src/js/popup.js',
+    content: './extension/src/js/content.js',
   },
   resolve: {
     extensions: ['.js', '.jsx', '.json'],
     modules: [
-      path.resolve('./src/js/'),
+      path.resolve('./extension/src/js/'),
       'node_modules',
     ],
   },

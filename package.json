@@ -10,7 +10,6 @@
   "author": "Mateusz Bagiński",
   "license": "MIT",
   "dependencies": {
-    "eslint-config-airbnb": "^17.0.0",
     "ramda": "^0.25.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1"
@@ -22,6 +21,7 @@
     "babel-loader": "^8.0.0-beta.4",
     "clean-webpack-plugin": "^0.1.19",
     "eslint": "^5.0.0",
+    "eslint-config-airbnb": "^17.0.0",
     "eslint-import-resolver-webpack": "^0.10.0",
     "eslint-loader": "^2.0.0",
     "eslint-plugin-import": "^2.12.0",

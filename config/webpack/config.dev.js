@@ -1,4 +1,3 @@
-const path = require('path');
 const sharedConfig = require('./config.shared.js')();
 
 module.exports = {
