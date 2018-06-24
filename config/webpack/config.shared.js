@@ -5,7 +5,14 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const getSharedConfig = () => ({
   entry: {
     popup: './extension/src/js/popup.js',
-    content: './extension/src/js/content.js',
+    content: [
+      '@babel/polyfill',
+      './extension/src/js/content.js',
+    ],
+    background: [
+      '@babel/polyfill',
+      './extension/src/js/background.js',
+    ],
   },
   resolve: {
     extensions: ['.js', '.jsx', '.json'],

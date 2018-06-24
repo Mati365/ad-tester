@@ -2,6 +2,7 @@ const sharedConfig = require('./config.shared.js')();
 
 module.exports = {
   ...sharedConfig,
+  watch: true,
   mode: 'development',
   devtool: 'source-map',
   module: {
