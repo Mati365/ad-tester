@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import * as R from 'ramda';
 
-import AdLayer from '../components/AdLayer';
+import AdLayer from '../components/Containers/AdOverlay/AdLayer';
 
 /**
  * Adds frame layer on top elemen

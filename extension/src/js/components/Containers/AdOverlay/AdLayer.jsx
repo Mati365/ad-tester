@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import c from 'classnames';
 
-import basicInjectSheet from '../helpers/basicInjectSheet';
+import basicInjectSheet from '../../../helpers/basicInjectSheet';
 
-import CenteredLayer from './CenteredLayer';
-import OutlinedText from './OutlinedText';
+import CenteredLayer from '../../Shared/CenteredLayer';
+import OutlinedText from '../../Shared/OutlinedText';
 import AdEdit from './AdEdit';
 
 const getElementDimensions = (element) => {

@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import c from 'classnames';
 
-import basicInjectSheet from '../helpers/basicInjectSheet';
-import OutlinedText from './OutlinedText';
+import basicInjectSheet from '../../../helpers/basicInjectSheet';
+import OutlinedText from '../../Shared/OutlinedText';
 
 const css = {
   adEdit: {
@@ -55,4 +55,4 @@ AdEdit.defaultProps = {
   titled: true,
 };
 
-export default basicInjectSheet(css, {inject: ['classes']})(AdEdit);
+export default basicInjectSheet(css)(AdEdit);

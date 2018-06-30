@@ -1,8 +1,11 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
 import * as R from 'ramda';
 
 import listAdFrames from './helpers/listAdFrames';
 import addFrameLayer from './helpers/addFrameLayer';
 
+import MainToolbar from './components/Containers/MainToolbar';
 import * as backend from './background';
 
 const formatFramesArray = R.compose(
@@ -41,3 +44,13 @@ const updateFramesMiddleware = () => {
 
 setInterval(updateFramesMiddleware, 2000);
 updateFramesMiddleware();
+
+/**
+ * Display toolbar panel
+ */
+const toolbarContainer = document.createElement('div');
+ReactDOM.render(
+  <MainToolbar />,
+  toolbarContainer,
+);
+document.body.appendChild(toolbarContainer);

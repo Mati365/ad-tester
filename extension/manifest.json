@@ -20,6 +20,9 @@
       "run_at": "document_idle"
     }
   ],
+  "web_accessible_resources": [
+    "resources/exposed/*"
+  ],
   "homepage_url": "https://github.com/Mati365/ad-tester",
   "permissions": [
     "tabs",

@@ -19,6 +19,8 @@
     "import/no-named-as-default": 0,
     "nonblock-statement-body-position": 0,
     "react/destructuring-assignment": 0,
-    "react/prop-types": 0
+    "react/prop-types": 0,
+    "jsx-quotes": ["error", "prefer-single"],
+    "no-bitwise": 0
   }
 }

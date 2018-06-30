@@ -1,7 +1,7 @@
 import React from 'react';
 import c from 'classnames';
 
-import basicInjectSheet from '../helpers/basicInjectSheet';
+import basicInjectSheet from '../../helpers/basicInjectSheet';
 
 const css = {
   layerCentered: {

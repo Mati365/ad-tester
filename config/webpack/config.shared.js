@@ -7,7 +7,7 @@ const getSharedConfig = () => ({
     popup: './extension/src/js/popup.js',
     content: [
       '@babel/polyfill',
-      './extension/src/js/content.js',
+      './extension/src/js/content.jsx',
     ],
     background: [
       '@babel/polyfill',
