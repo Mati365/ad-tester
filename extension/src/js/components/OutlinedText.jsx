@@ -1,17 +1,26 @@
 import React from 'react';
+import c from 'classnames';
 
-const OutlinedText = ({style, ...props}) => (
+import basicInjectSheet from '../helpers/basicInjectSheet';
+
+const css = {
+  outlinedText: {
+    fontFamily: 'Verdana,sans-serif',
+    color: '#fff',
+    textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000',
+  },
+};
+
+const OutlinedText = ({className, classes, ...props}) => (
   <span
     {...props}
-    style={{
-      ...style,
-      fontFamily: 'Verdana,sans-serif',
-      color: '#fff',
-      textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000',
-    }}
+    className={c(
+      classes.outlinedText,
+      className,
+    )}
   />
 );
 
 OutlinedText.displayName = 'OutlinedText';
 
-export default OutlinedText;
+export default basicInjectSheet(css)(OutlinedText);

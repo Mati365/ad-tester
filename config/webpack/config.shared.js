@@ -51,6 +51,7 @@ const getSharedConfig = () => ({
           loader: 'babel-loader',
           options: {
             plugins: [
+              ['@babel/plugin-proposal-decorators', {legacy: true}],
               '@babel/plugin-proposal-class-properties',
             ],
             presets: [

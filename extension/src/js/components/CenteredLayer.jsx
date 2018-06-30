@@ -1,19 +1,28 @@
 import React from 'react';
+import c from 'classnames';
 
-const CenteredLayer = ({style, ...props}) => (
+import basicInjectSheet from '../helpers/basicInjectSheet';
+
+const css = {
+  layerCentered: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+  },
+};
+
+const CenteredLayer = ({className, classes, ...props}) => (
   <div
     {...props}
-    style={{
-      ...style,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: '100%',
-      height: '100%',
-    }}
+    className={c(
+      className,
+      classes.layerCentered,
+    )}
   />
 );
 
 CenteredLayer.displayName = 'CenteredLayer';
 
-export default CenteredLayer;
+export default basicInjectSheet(css)(CenteredLayer);
