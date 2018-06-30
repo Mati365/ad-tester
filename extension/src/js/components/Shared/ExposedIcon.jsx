@@ -13,6 +13,13 @@ const css = {
     width: 10,
     height: 10,
   },
+  btnIcon: {
+    transition: 'filter 100ms ease-in-out',
+
+    '&:hover': {
+      filter: 'brightness(50%)',
+    },
+  },
 };
 
 const ExposedIcon = ({
@@ -23,8 +30,9 @@ const ExposedIcon = ({
     src={getExposedResourceURL(`icons/${type}.svg`)}
     alt={`icon-${type}`}
     className={c(
-      classes.icon,
       className,
+      classes.icon,
+      (props.onClick || props.onMouseDown) && classes.btnIcon,
     )}
   />
 );

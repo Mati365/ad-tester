@@ -18,7 +18,7 @@ const css = {
     width: '100%',
     minHeight: TOOLBAR_HEIGHT,
     background: '#fff',
-    zIndex: 999999,
+    zIndex: 99999999,
   },
   header: {},
   content: {
@@ -28,10 +28,11 @@ const css = {
 };
 
 const Toolbar = ({
-  children, className, classes, panel, rightPanel, ...props
+  children, className, classes, panel, rightPanel, withRef, ...props
 }) => (
   <div
     {...props}
+    {...withRef && {ref: withRef}}
     className={c(
       classes.toolbar,
       className,

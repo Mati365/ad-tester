@@ -45,7 +45,7 @@ const throttle = (timeout, fn) => {
 const css = {
   adLayer: {
     position: 'absolute',
-    zIndex: 99999,
+    zIndex: 9999999,
     background: 'rgba(255, 0, 0, 0.5)',
     border: '2px solid #FF0000',
   },
