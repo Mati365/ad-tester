@@ -210,6 +210,8 @@ export default class Resizable extends React.PureComponent {
 
   onEndResize = () => {
     const updater = (state) => {
+      this.startMousePos = null;
+
       const dimensions = R.compose(
         this.props.onSizeClamp,
         addVectorToDimensions,
@@ -267,6 +269,7 @@ export default class Resizable extends React.PureComponent {
         ? addVectorToDimensions(dimensions, delta)
         : dimensions,
       sticky,
+      !!this.startMousePos,
       {
         onSetDimensions: this.onSetDimensions,
         onSetSticky: this.onSetSticky,

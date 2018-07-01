@@ -8,11 +8,16 @@ import {
 } from '../../../decorators';
 
 import Toolbar, {TOOLBAR_HEIGHT} from '../../Shared/Toolbar';
-import Resizable from '../../Shared/Resizable';
-import WatchWindowResize from '../../Shared/WatchWindowResize';
+import {
+  Resizable,
+  WatchWindowResize,
+  CenteredLayer,
+  ExposedIcon,
+} from '../../Shared';
 
 import MaximizeGroup from './MaximizeGroup';
 import StickyGroup from './StickyGroup';
+import AdEditor from './AdEditor';
 
 const INITIAL_DIMENSIONS = (() => {
   const [w, h] = [
@@ -31,10 +36,12 @@ const INITIAL_DIMENSIONS = (() => {
 @wrap(
   (Component, props) => (
     <Resizable initialDimensions={INITIAL_DIMENSIONS}>
-      {(ref, handles, dimensions, sticky, setters) => (
+      {(ref, handles, dimensions, sticky, resizing, setters) => (
         <Component
           withRef={ref}
-          {...{handles, sticky, dimensions}}
+          {...{
+            handles, sticky, resizing, dimensions,
+          }}
           {...setters}
           {...props}
         />
@@ -47,14 +54,7 @@ const INITIAL_DIMENSIONS = (() => {
   initialToggle: true,
 })
 export default class ToggleableToolbar extends React.PureComponent {
-  state = {
-    truncated: true,
-  };
-
   onSetMinimize = (minimized) => {
-    if (minimized === this.state.minimized)
-      return;
-
     const {dimensions, onSetDimensions} = this.props;
     if (minimized)
       onSetDimensions(null);
@@ -86,16 +86,29 @@ export default class ToggleableToolbar extends React.PureComponent {
 
   render() {
     const {minimized} = this;
-    const {truncated} = this.state;
     const {
-      dimensions, handles, withRef,
+      dimensions, resizing, handles, withRef,
       sticky, onSetDimensions,
     } = this.props;
 
     let content = null;
     if (!minimized) {
       content = (
-        <div style={{height: 200}} />
+        resizing
+          ? (
+            <CenteredLayer>
+              <ExposedIcon
+                type='resize'
+                style={{
+                  width: 20,
+                  height: 20,
+                }}
+              />
+            </CenteredLayer>
+          )
+          : (
+            <AdEditor />
+          )
       );
     }
 
@@ -106,9 +119,6 @@ export default class ToggleableToolbar extends React.PureComponent {
       height: `${dimensions.h}px`,
       width: `${dimensions.w}px`,
     };
-
-    if (!truncated)
-      styleDimensions.width = '100vw';
 
     const styleAttach = {
       right: 0,
