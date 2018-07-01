@@ -1,13 +1,17 @@
 import React from 'react';
+import {connect} from 'react-redux';
+import * as R from 'ramda';
 
 import {TOOLBAR_BORDER} from '../../../constants/colors';
+import {Actions} from '../../../redux/adModule';
 
 import {
   toggleable,
   wrap,
+  withAppStore,
 } from '../../../decorators';
 
-import Toolbar, {TOOLBAR_HEIGHT} from '../../Shared/Toolbar';
+import Toolbar, {ToolbarIcon, TOOLBAR_HEIGHT} from '../../Shared/Toolbar';
 import {
   Resizable,
   WatchWindowResize,
@@ -21,8 +25,8 @@ import AdEditor from './AdEditor';
 
 const INITIAL_DIMENSIONS = (() => {
   const [w, h] = [
-    window.innerWidth * 0.4,
-    TOOLBAR_HEIGHT,
+    window.innerWidth,
+    TOOLBAR_HEIGHT + 150,
   ];
 
   return {
@@ -33,6 +37,18 @@ const INITIAL_DIMENSIONS = (() => {
   };
 })();
 
+@withAppStore
+@connect(
+  ({ads: {codes, active}}) => ({
+    toggled: !R.isNil(active),
+    code: R.defaultTo('', codes[active]),
+    activeUUID: active,
+  }),
+  dispatch => ({
+    editAd: (id, code) => dispatch(Actions.editAd(id, code)),
+    blurAd: () => dispatch(Actions.blurAd()),
+  }),
+)
 @wrap(
   (Component, props) => (
     <Resizable initialDimensions={INITIAL_DIMENSIONS}>
@@ -56,17 +72,17 @@ const INITIAL_DIMENSIONS = (() => {
 export default class ToggleableToolbar extends React.PureComponent {
   onSetMinimize = (minimized) => {
     const {dimensions, onSetDimensions} = this.props;
-    if (minimized)
-      onSetDimensions(null);
-    else {
-      const h = window.innerHeight / 2;
+    const h = (
+      minimized
+        ? TOOLBAR_HEIGHT
+        : window.innerHeight / 2
+    );
 
-      onSetDimensions({
-        ...dimensions,
-        y: window.innerHeight - h,
-        h,
-      });
-    }
+    onSetDimensions({
+      ...dimensions,
+      y: window.innerHeight - h,
+      h,
+    });
   };
 
   onWindowResize = (wnd) => {
@@ -88,7 +104,8 @@ export default class ToggleableToolbar extends React.PureComponent {
     const {minimized} = this;
     const {
       dimensions, resizing, handles, withRef,
-      sticky, onSetDimensions,
+      sticky, code, activeUUID, editAd, blurAd,
+      onSetDimensions,
     } = this.props;
 
     let content = null;
@@ -107,7 +124,12 @@ export default class ToggleableToolbar extends React.PureComponent {
             </CenteredLayer>
           )
           : (
-            <AdEditor />
+            <AdEditor
+              value={code}
+              onChange={
+                newCode => editAd(activeUUID, newCode)
+              }
+            />
           )
       );
     }
@@ -133,6 +155,7 @@ export default class ToggleableToolbar extends React.PureComponent {
         <span
           style={{
             display: 'inherit',
+            alignItems: 'inherit',
             marginRight: 8,
           }}
         >
@@ -162,10 +185,16 @@ export default class ToggleableToolbar extends React.PureComponent {
             ...styleDimensions,
           }}
           rightPanel={(
-            <MaximizeGroup
-              minimized={minimized}
-              onSetMinimize={this.onSetMinimize}
-            />
+            <>
+              <MaximizeGroup
+                minimized={minimized}
+                onSetMinimize={this.onSetMinimize}
+              />
+              <ToolbarIcon
+                type='close'
+                onClick={blurAd}
+              />
+            </>
           )}
         >
           {content}

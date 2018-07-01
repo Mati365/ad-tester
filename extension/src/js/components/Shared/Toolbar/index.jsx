@@ -23,6 +23,8 @@ const css = {
   header: {},
   content: {
     flex: 1,
+    flexShrink: 1,
+    maxHeight: `calc(100% - ${TOOLBAR_HEIGHT}px)`,
     background: '#fff',
   },
 };

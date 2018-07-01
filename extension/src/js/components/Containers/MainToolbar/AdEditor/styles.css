@@ -1,3 +1,11 @@
-.react-codemirror2, .CodeMirror {
+.react-codemirror2,
+.CodeMirror {
+  position: relative;
   height: 100%;
+}
+
+.CodeMirror,
+.CodeMirror * {
+  font-family: Arial, monospace;
+  font-size: 13px !important;
 }

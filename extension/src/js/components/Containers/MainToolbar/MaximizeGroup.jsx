@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {ToolbarIcon} from '../../Shared/Toolbar';
 import SecondaryToolbarIcon from './SecondaryToolbarIcon';
 
 const MaximizeGroup = ({minimized, onSetMinimize}) => (
@@ -19,7 +18,6 @@ const MaximizeGroup = ({minimized, onSetMinimize}) => (
         />
       )
     }
-    <ToolbarIcon type='close' />
   </>
 );
 

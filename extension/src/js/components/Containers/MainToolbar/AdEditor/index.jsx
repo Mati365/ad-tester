@@ -1,26 +1,44 @@
 import React from 'react';
 
 import 'codemirror/lib/codemirror.css';
-import {UnControlled as CodeMirror} from 'react-codemirror2';
+import {Controlled as CodeMirror} from 'react-codemirror2';
 
 import './styles.css';
 
-require('codemirror/mode/xml/xml');
 require('codemirror/mode/htmlmixed/htmlmixed');
 
-const AdEditor = () => (
-  <CodeMirror
-    value='AD CODE'
-    options={{
-      mode: 'htmlmixed',
-      theme: 'default',
-      lineNumbers: true,
-      indentWithTabs: false,
-      tabSize: 2,
-    }}
-  />
-);
+export default class AdEditor extends React.PureComponent {
+  state = {
+    editorMounted: false,
+  };
 
-AdEditor.displayName = 'AdEditor';
+  componentDidMount() {
+    setTimeout(
+      () => this.setState({editorMounted: true}),
+      500,
+    );
+  }
 
-export default AdEditor;
+  render() {
+    const {value, onChange} = this.props;
+
+    if (!this.state.editorMounted)
+      return null;
+
+    return (
+      <CodeMirror
+        value={value}
+        options={{
+          mode: 'htmlmixed',
+          theme: 'default',
+          lineNumbers: true,
+          tabSize: 2,
+        }}
+        onBeforeChange={(editor, data, newValue) => {
+          if (onChange && newValue !== value)
+            onChange(newValue);
+        }}
+      />
+    );
+  }
+}

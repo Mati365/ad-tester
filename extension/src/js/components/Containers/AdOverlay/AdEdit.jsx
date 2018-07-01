@@ -20,7 +20,7 @@ const css = {
 };
 
 const AdEdit = ({
-  children, titled, classes, className, ...props
+  children, titled, classes, className, editing, ...props
 }) => (
   <div
     {...props}
@@ -35,13 +35,12 @@ const AdEdit = ({
           marginRight: titled ? 6 : 0,
         }}
       >
-        ✎
+        {editing ? '☆' : '✎'}
       </span>
-      {titled && (
-        chrome.i18n.getMessage('edit_ad')
-      )}
+      {children || (titled && (
+        chrome.i18n.getMessage(editing ? 'editing_ad' : 'edit_ad')
+      ))}
     </OutlinedText>
-    {children}
   </div>
 );
 
@@ -49,10 +48,12 @@ AdEdit.displayName = 'AdEdit';
 
 AdEdit.propTypes = {
   titled: PropTypes.bool,
+  editing: PropTypes.bool,
 };
 
 AdEdit.defaultProps = {
   titled: true,
+  editing: false,
 };
 
 export default basicInjectSheet(css)(AdEdit);

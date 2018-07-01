@@ -2,6 +2,26 @@ import * as R from 'ramda';
 
 const CACHE_SELECTOR_KEY = 'data-cached-slot-selector';
 
+const wrapWithHTMLSkel = (code, headTags = '') => `
+  <html>
+    <head>
+      <title>AD PREVIEW</title>
+      <meta charset="UTF-8" />
+      <style>
+        body, html {
+          margin: 0;
+          padding: 0;
+        }
+      </style>
+      ${headTags}
+    </head>
+
+    <body>
+      ${code}
+    </body>
+  </html>
+`;
+
 /**
  * @param {string}  tag
  * @param {object}  string
@@ -12,8 +32,8 @@ const createElement = (tag, styles, attributes) => {
     Object.assign(frame.style, styles);
 
   if (attributes) {
-    R.forEach(
-      (key, attribute) => frame.setAttribute(key, attribute),
+    R.forEachObjIndexed(
+      (attribute, key) => frame.setAttribute(key, attribute),
       attributes,
     );
   }
@@ -40,34 +60,58 @@ const searchSlot = selector => (
  * @param {string}  code
  * @param {object}  styles
  */
-const replaceAdSlot = (selector, code, styles) => {
-  const element = searchSlot(selector);
+const replaceAdSlot = (selector, code, styles = {}) => {
+  const element = selector instanceof Element
+    ? selector
+    : searchSlot(selector);
+
   if (!element)
     return false;
 
   const {parentNode: parent} = element;
   if (!parent)
-    return false;
+    return null;
 
-  const frame = createElement(
-    'iframe',
-    {
-      ...(styles || {}),
-      width: `${element.offsetWidth}px`,
-      height: `${element.offsetHeight}px`,
-      border: 0,
-      margin: 0,
-    },
-    {
-      srcdoc: code,
-      [CACHE_SELECTOR_KEY]: selector,
-    },
+  let frame = parent.querySelector('[data-ad-preview]');
+  const cached = !!frame;
+  if (!frame) {
+    frame = createElement(
+      'iframe',
+      {
+        ...(styles || {}),
+        width: `${element.offsetWidth}px`,
+        height: `${element.offsetHeight}px`,
+        margin: 0,
+        border: '1px dashed rgba(0, 0, 0, 0.45)',
+      },
+      {
+        'data-ad-preview': true,
+        ...R.is(String, selector) && {
+          [CACHE_SELECTOR_KEY]: selector,
+        },
+      },
+    );
+  }
+
+  frame.srcdoc = wrapWithHTMLSkel(
+    code,
+    `
+      <style>
+        html, body {
+          overflow: hidden;
+          width: ${element.offsetWidth}px;
+          height: ${element.offsetHeight}px;
+        }
+      </style>
+    `,
   );
 
-  parent.removeChild(element);
-  parent.appendChild(frame);
+  if (!cached) {
+    parent.appendChild(frame);
+    parent.removeChild(element);
+  }
 
-  return true;
+  return frame;
 };
 
 export default replaceAdSlot;
