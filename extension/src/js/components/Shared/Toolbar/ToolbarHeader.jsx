@@ -16,7 +16,7 @@ const css = {
     flexDirection: 'row',
 
     width: '100%',
-    height: TOOLBAR_HEIGHT, // with bottom and top border
+    minHeight: TOOLBAR_HEIGHT, // with bottom and top border
     lineHeight: `${TOOLBAR_HEIGHT}px`,
     padding: '0 7px',
     borderWidth: '1px 0 1px 0',

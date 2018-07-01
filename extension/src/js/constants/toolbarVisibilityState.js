@@ -1,8 +1,7 @@
 export default {
   CLOSED: 0,
-  MAXIMIZED: 1,
-  MINIMIZED: 2,
-  TRUNCATED: 4,
-  ATTACH_LEFT: 8,
-  ATTACH_RIGHT: 16,
+  MINIMIZED: 1,
+  TRUNCATED: 2,
+  ATTACH_LEFT: 4,
+  ATTACH_RIGHT: 8,
 };

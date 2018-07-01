@@ -5,6 +5,7 @@ import * as R from 'ramda';
 export default ({
   unmountNotToggled = false,
   initialToggle = false,
+  getToggleFromProps = R.always(undefined),
 } = {}) => Component => (
   class extends React.PureComponent {
     static displayName = 'toggleable()';
@@ -29,6 +30,10 @@ export default ({
     });
 
     static getDerivedStateFromProps(props, state) {
+      const newToggle = getToggleFromProps(props, state.toggled);
+      if (newToggle !== undefined)
+        return R.objOf('toggled', newToggle);
+
       if (!R.propSatisfies(R.isNil, 'toggled', props) && props.toggled !== state.toggled) {
         return {
           toggled: props.toggled,

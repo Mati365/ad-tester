@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import * as R from 'ramda';
 
+import {argReferenceMemoize} from '../../../helpers';
 import ResizeHandle, {HorizontalResizeHandle} from './ResizeHandle';
 
 export {default as ResizeHandle} from './ResizeHandle';
 
-const DIRECTION = {
+export const DIRECTION = {
   TOP: 'top',
   LEFT: 'left',
   RIGHT: 'right',
@@ -54,37 +55,77 @@ const addVectorToDimensions = (dimensions, delta) => ({
   h: dimensions.h - delta.y,
 });
 
+const clamp = (min, max, value) => (
+  Math.min(Math.max(value, min), max)
+);
+
+const getStickyFlags = dimensions => ({
+  w: dimensions.w >= window.innerWidth,
+  h: dimensions.h >= window.innerHeight,
+});
+
+export const onSizeClamp = ({
+  x, y, w, h,
+}) => {
+  const pos = {
+    w: clamp(0, window.innerWidth, w),
+    h: clamp(0, window.innerHeight, h),
+  };
+
+  return {
+    ...pos,
+    x: clamp(0, window.innerWidth - pos.w, x),
+    y: clamp(0, window.innerHeight - pos.h, y),
+  };
+};
+
 export default class Resizable extends React.PureComponent {
   nodeRef = React.createRef();
 
   startMousePos = null;
 
   static propTypes = {
+    initialDimensions: PropTypes.shape({
+      x: PropTypes.number,
+      y: PropTypes.number,
+      w: PropTypes.number,
+      h: PropTypes.number,
+    }),
     edges: PropTypes.shape({
       top: PropTypes.bool,
       bottom: PropTypes.bool,
       left: PropTypes.bool,
       right: PropTypes.bool,
     }),
+    onSizeClamp: PropTypes.func,
   };
 
   static defaultProps = {
+    initialDimensions: null,
     edges: {
       top: true,
       left: true,
       right: false,
       bottom: false,
     },
+    onSizeClamp,
   };
 
-  state = {
-    resizeDirection: null,
-    dimensions: null,
-    delta: {
-      x: 0,
-      y: 0,
-    },
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      resizeDirection: null,
+      dimensions: props.initialDimensions,
+      sticky: {
+        w: false,
+        h: false,
+      },
+      delta: {
+        x: 0,
+        y: 0,
+      },
+    };
+  }
 
   componentDidUpdate(prevProps, prevState) {
     const {resizeDirection} = this.state;
@@ -99,6 +140,25 @@ export default class Resizable extends React.PureComponent {
 
   componentWillUnmount() {
     this.detachDocumentListeners();
+  }
+
+  onSetDimensions = (dimensions, checkSticky = false) => {
+    const updater = state => ({
+      sticky: (
+        checkSticky
+          ? getStickyFlags(dimensions)
+          : state.sticky
+      ),
+      dimensions: R.compose(
+        this.props.onSizeClamp,
+        checkSticky
+          ? R.identity
+          : this.clampSticky,
+        R.defaultTo(this.props.initialDimensions),
+      )(dimensions),
+    });
+
+    this.setState(updater);
   }
 
   onStartResize = (resizeDirection) => {
@@ -144,14 +204,46 @@ export default class Resizable extends React.PureComponent {
     });
   }
 
+  onSetSticky = sticky => this.setState({
+    sticky,
+  });
+
   onEndResize = () => {
-    this.setState(
-      state => ({
+    const updater = (state) => {
+      const dimensions = R.compose(
+        this.props.onSizeClamp,
+        addVectorToDimensions,
+      )(state.dimensions, state.delta);
+
+      return {
         resizeDirection: null,
         delta: null,
-        dimensions: addVectorToDimensions(state.dimensions, state.delta),
-      }),
-    );
+        dimensions,
+        sticky: getStickyFlags(dimensions),
+      };
+    };
+
+    this.setState(updater);
+  };
+
+  getCachedResizeHandles = argReferenceMemoize(bindResizeHandles);
+
+  clampSticky = (dimensions) => {
+    const {sticky} = this.state;
+
+    const newDimensions = {
+      w: sticky.w ? window.innerWidth : dimensions.w,
+      h: sticky.h ? window.innerHeight : dimensions.h,
+    };
+
+    if (newDimensions.w !== dimensions.w || newDimensions.h !== dimensions.h) {
+      return {
+        ...dimensions,
+        ...newDimensions,
+      };
+    }
+
+    return dimensions;
   };
 
   attachDocumentListeners = () => {
@@ -165,15 +257,20 @@ export default class Resizable extends React.PureComponent {
   };
 
   render() {
-    const {delta, dimensions} = this.state;
+    const {delta, sticky, dimensions} = this.state;
     const {edges} = this.props;
 
     return this.props.children(
       this.nodeRef,
-      bindResizeHandles(edges, this.onStartResize),
+      this.getCachedResizeHandles(edges, this.onStartResize),
       delta && dimensions
         ? addVectorToDimensions(dimensions, delta)
         : dimensions,
+      sticky,
+      {
+        onSetDimensions: this.onSetDimensions,
+        onSetSticky: this.onSetSticky,
+      },
     );
   }
 }

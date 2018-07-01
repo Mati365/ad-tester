@@ -4,8 +4,12 @@ import c from 'classnames';
 
 import basicInjectSheet from '../../../helpers/basicInjectSheet';
 
-import CenteredLayer from '../../Shared/CenteredLayer';
-import OutlinedText from '../../Shared/OutlinedText';
+import {
+  WatchWindowResize,
+  CenteredLayer,
+  OutlinedText,
+} from '../../Shared';
+
 import AdEdit from './AdEdit';
 
 const getElementDimensions = (element) => {
@@ -16,22 +20,6 @@ const getElementDimensions = (element) => {
     top: rect.top + window.scrollY,
     width: rect.width,
     height: rect.height,
-  };
-};
-
-const throttle = (timeout, fn) => {
-  let lastCall = null;
-  let previousReturn = null;
-
-  return (...args) => {
-    const call = !lastCall || Date.now() - lastCall >= timeout;
-
-    if (call) {
-      lastCall = Date.now();
-      previousReturn = fn(...args);
-    }
-
-    return previousReturn;
   };
 };
 
@@ -60,25 +48,16 @@ export default class AdLayer extends React.PureComponent {
   constructor(props) {
     super(props);
 
-    this.onScroll = throttle(200, this.onResize);
     this.state = {
       dimensions: getElementDimensions(props.element),
     };
   }
 
   componentDidMount() {
-    document.addEventListener('resize', this.onResize);
-    document.addEventListener('scroll', this.onScroll);
-
     setInterval(
       this.onResize,
       2000,
     );
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('resize', this.onResize);
-    document.removeEventListener('scroll', this.onScroll);
   }
 
   onResize = () => {
@@ -98,36 +77,38 @@ export default class AdLayer extends React.PureComponent {
       return null;
 
     return (
-      <div
-        {...props}
-        className={c(
-          classes.adLayer,
-          className,
-        )}
-        style={{
-          ...style,
-          ...dimensions,
-        }}
-      >
-        <CenteredLayer>
-          <AdEdit
-            titled={dimensions.width >= 150}
-          />
-          <OutlinedText
-            style={{
-              fontSize: 12,
-              textAlign: 'center',
-            }}
-          >
-            {dimensions.height >= 120 && (
-              <div style={{marginBottom: 2}}>
-                {chrome.i18n.getMessage('ad_creation_dimensions')}
-              </div>
-            )}
-            {`${Number.parseInt(dimensions.width, 10)}px : ${Number.parseInt(dimensions.height, 10)}px`}
-          </OutlinedText>
-        </CenteredLayer>
-      </div>
+      <WatchWindowResize onResize={this.onResize}>
+        <div
+          {...props}
+          className={c(
+            classes.adLayer,
+            className,
+          )}
+          style={{
+            ...style,
+            ...dimensions,
+          }}
+        >
+          <CenteredLayer>
+            <AdEdit
+              titled={dimensions.width >= 150}
+            />
+            <OutlinedText
+              style={{
+                fontSize: 12,
+                textAlign: 'center',
+              }}
+            >
+              {dimensions.height >= 120 && (
+                <div style={{marginBottom: 2}}>
+                  {chrome.i18n.getMessage('ad_creation_dimensions')}
+                </div>
+              )}
+              {`${Number.parseInt(dimensions.width, 10)}px : ${Number.parseInt(dimensions.height, 10)}px`}
+            </OutlinedText>
+          </CenteredLayer>
+        </div>
+      </WatchWindowResize>
     );
   }
 }
