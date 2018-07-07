@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import basicInjectSheet from '../../../helpers/basicInjectSheet';
 import * as colors from '../../../constants/colors';
 
-import {PullRight} from '../PullAlign';
+import PullAlign from '../PullAlign';
 
 export const TOOLBAR_HEIGHT = 28;
 
@@ -45,9 +45,9 @@ const ToolbarHeader = ({
   >
     {children}
     {rightPanel && (
-      <PullRight>
+      <PullAlign.Right>
         {rightPanel}
-      </PullRight>
+      </PullAlign.Right>
     )}
   </div>
 );

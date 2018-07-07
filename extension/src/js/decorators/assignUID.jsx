@@ -1,26 +1,32 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-const generateUUID = (() => {
-  let counter = 0;
-
-  return (prefix) => {
-    counter += 1;
-
-    return `${prefix}-${counter}-${Date.now()}`;
-  };
-})();
+import {generateUUID} from '../helpers';
 
 export default (prefix = 'UUID') => Component => (
   class extends React.Component {
-    uuid = generateUUID(prefix);
-
     static displayName = `uuid(${prefix})`;
+
+    static propTypes = {
+      uuid: PropTypes.string,
+    }
+
+    static defaultProps = {
+      uuid: null,
+    };
+
+    constructor(props) {
+      super(props);
+      this.state = {
+        uuid: props.uuid || generateUUID(prefix),
+      };
+    }
 
     render() {
       return (
         <Component
           {...this.props}
-          uuid={this.uuid}
+          {...this.state}
         />
       );
     }

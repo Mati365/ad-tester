@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-const CACHE_SELECTOR_KEY = 'data-cached-slot-selector';
+import {AD_REPLACED_ATTRIBUTE} from '../constants';
 
 const wrapWithHTMLSkel = (code, headTags = '') => `
   <html>
@@ -47,7 +47,6 @@ const createElement = (tag, styles, attributes) => {
  */
 const searchSlot = selector => (
   document.querySelector(selector)
-    || document.querySelector(`[${CACHE_SELECTOR_KEY}="${selector}"]`)
 );
 
 /**
@@ -84,32 +83,36 @@ const replaceAdSlot = (selector, code, styles = {}) => {
         margin: 0,
         border: '1px dashed rgba(0, 0, 0, 0.45)',
       },
-      {
-        'data-ad-preview': true,
-        ...R.is(String, selector) && {
-          [CACHE_SELECTOR_KEY]: selector,
-        },
-      },
     );
   }
-
-  frame.srcdoc = wrapWithHTMLSkel(
-    code,
-    `
-      <style>
-        html, body {
-          overflow: hidden;
-          width: ${element.offsetWidth}px;
-          height: ${element.offsetHeight}px;
-        }
-      </style>
-    `,
-  );
 
   if (!cached) {
     parent.appendChild(frame);
     parent.removeChild(element);
   }
+
+  // kill all previous requests
+  frame.srcdoc = '';
+
+  // wait until all requests are killed
+  setTimeout(
+    () => {
+      frame.setAttribute(AD_REPLACED_ATTRIBUTE, true);
+      frame.srcdoc = wrapWithHTMLSkel(
+        code,
+        `
+          <style>
+            html, body {
+              overflow: hidden;
+              width: ${element.offsetWidth}px;
+              height: ${element.offsetHeight}px;
+            }
+          </style>
+        `,
+      );
+    },
+    60,
+  );
 
   return frame;
 };

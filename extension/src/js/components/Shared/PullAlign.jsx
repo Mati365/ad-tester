@@ -23,9 +23,15 @@ PullAlign.propTypes = {
   direction: PropTypes.oneOf(['right', 'left']).isRequired,
 };
 
-export const PullRight = withProps(
+PullAlign.Right = withProps(
   {
     direction: 'right',
+  },
+)(PullAlign);
+
+PullAlign.Left = withProps(
+  {
+    direction: 'left',
   },
 )(PullAlign);
 

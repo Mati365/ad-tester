@@ -1,6 +1,11 @@
 import * as R from 'ramda';
 import cacheCall from './helpers/cacheCall';
 
+import {
+  AD_PREVIEW_ATTRIBUTE,
+  AD_REPLACED_ATTRIBUTE,
+} from './constants';
+
 const isBackgroundScript = R.is(
   Function,
   chrome && chrome.browserAction && chrome.browserAction.setBadgeText,
@@ -99,5 +104,52 @@ export const setBadgeBackgroundColor = R.compose(
   linkBackendMethod('setBadgeBackgroundColor'),
   R.objOf('color'),
 );
+
+if (isBackgroundScript) {
+  const pickContentLength = R.compose(
+    ({value}) => +value,
+    R.defaultTo({value: 0}),
+    R.find(
+      item => R.toLower(item.name) === 'content-length',
+    ),
+  );
+
+  const watchAdsSize = (e) => {
+    const contentLength = pickContentLength(e.responseHeaders);
+    chrome.tabs.executeScript(
+      e.tabId,
+      {
+        frameId: e.frameId,
+        code: `(function() {
+          var frame = window.frameElement;
+          if (!frame || !frame.getAttribute("${AD_REPLACED_ATTRIBUTE}"))
+            return null;
+
+          return frame.getAttribute("${AD_PREVIEW_ATTRIBUTE}");
+        })();`,
+        matchAboutBlank: true,
+      },
+      ([adPreview]) => {
+        if (!adPreview)
+          return;
+
+        console.info(adPreview, e.url, contentLength, `${contentLength / 1024}kB`);
+      },
+    );
+
+    return {
+      responseHeaders: e.responseHeaders,
+    };
+  };
+
+  chrome.webRequest.onHeadersReceived.addListener(
+    watchAdsSize,
+    {
+      urls: ['<all_urls>'],
+      types: ['image'],
+    },
+    ['responseHeaders'],
+  );
+}
 
 export default Backend;

@@ -1,9 +1,14 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 import * as R from 'ramda';
 
+import AD_SCHEMA from '../../../constants/adSchema';
 import {TOOLBAR_BORDER} from '../../../constants/colors';
-import {Actions} from '../../../redux/adModule';
+import {
+  Actions,
+  activeAdSelector,
+} from '../../../redux/adModule';
 
 import {
   toggleable,
@@ -22,10 +27,11 @@ import {
 import MaximizeGroup from './MaximizeGroup';
 import StickyGroup from './StickyGroup';
 import AdEditor from './AdEditor';
+import EditorFooter from './EditorFooter';
 
-const INITIAL_DIMENSIONS = (() => {
+const getInitialDimensions = R.once(() => {
   const [w, h] = [
-    window.innerWidth,
+    window.innerWidth * 0.4,
     TOOLBAR_HEIGHT + 150,
   ];
 
@@ -35,23 +41,23 @@ const INITIAL_DIMENSIONS = (() => {
     w,
     h,
   };
-})();
+});
 
 @withAppStore
 @connect(
-  ({ads: {codes, active}}) => ({
-    toggled: !R.isNil(active),
-    code: R.defaultTo('', codes[active]),
-    activeUUID: active,
+  ({ads}) => ({
+    toggled: !R.isNil(ads.active),
+    activeUUID: ads.active,
+    ad: activeAdSelector(ads),
   }),
   dispatch => ({
-    editAd: (id, code) => dispatch(Actions.editAd(id, code)),
+    editAd: (...args) => dispatch(Actions.editAd(...args)),
     blurAd: () => dispatch(Actions.blurAd()),
   }),
 )
 @wrap(
   (Component, props) => (
-    <Resizable initialDimensions={INITIAL_DIMENSIONS}>
+    <Resizable initialDimensions={getInitialDimensions()}>
       {(ref, handles, dimensions, sticky, resizing, setters) => (
         <Component
           withRef={ref}
@@ -70,6 +76,17 @@ const INITIAL_DIMENSIONS = (() => {
   initialToggle: true,
 })
 export default class ToggleableToolbar extends React.PureComponent {
+  editorRef = React.createRef();
+
+  static propTypes = {
+    ad: AD_SCHEMA.isRequired,
+  };
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.activeUUID !== this.props.activeUUID)
+      this.onFocusInput();
+  }
+
   onSetMinimize = (minimized) => {
     const {dimensions, onSetDimensions} = this.props;
     const h = (
@@ -95,6 +112,24 @@ export default class ToggleableToolbar extends React.PureComponent {
     });
   };
 
+  onFocusInput = () => {
+    const textField = ReactDOM
+      .findDOMNode(this.editorRef.current)
+      .querySelector('textarea');
+
+    if (textField)
+      textField.focus();
+  };
+
+  onEditAd = (newCode) => {
+    this.props.editAd(
+      this.props.activeUUID,
+      {
+        code: newCode,
+      },
+    );
+  };
+
   get minimized() {
     const {dimensions} = this.props;
     return !dimensions || dimensions.h <= TOOLBAR_HEIGHT;
@@ -104,7 +139,7 @@ export default class ToggleableToolbar extends React.PureComponent {
     const {minimized} = this;
     const {
       dimensions, resizing, handles, withRef,
-      sticky, code, activeUUID, editAd, blurAd,
+      sticky, ad, blurAd,
       onSetDimensions,
     } = this.props;
 
@@ -125,10 +160,10 @@ export default class ToggleableToolbar extends React.PureComponent {
           )
           : (
             <AdEditor
-              value={code}
-              onChange={
-                newCode => editAd(activeUUID, newCode)
-              }
+              withRef={this.editorRef}
+              value={ad.code}
+              onChange={this.onEditAd}
+              onEditorLoaded={this.onFocusInput}
             />
           )
       );
@@ -176,7 +211,6 @@ export default class ToggleableToolbar extends React.PureComponent {
       >
         <Toolbar
           withRef={withRef}
-          panel={panel}
           style={{
             ...!styleDimensions && {
               transition: 'height 200ms ease-in-out',
@@ -184,6 +218,7 @@ export default class ToggleableToolbar extends React.PureComponent {
             ...styleAttach,
             ...styleDimensions,
           }}
+          panel={panel}
           rightPanel={(
             <>
               <MaximizeGroup
@@ -195,6 +230,9 @@ export default class ToggleableToolbar extends React.PureComponent {
                 onClick={blurAd}
               />
             </>
+          )}
+          footer={!minimized && (
+            <EditorFooter ad={ad} />
           )}
         >
           {content}

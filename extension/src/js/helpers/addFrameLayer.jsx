@@ -1,8 +1,28 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import * as R from 'ramda';
 
+import {AD_PREVIEW_ATTRIBUTE} from '../constants';
+
+import generateUUID from './generateUUID';
 import AdLayer from '../components/Containers/AdOverlay/AdLayer';
+
+/**
+ * All layers in slots will be mounted
+ * to this div, removing this div
+ * will hide all layers
+ */
+const FRAME_LAYER_ROOT = document.createElement('ad-preview-layer');
+document.body.appendChild(FRAME_LAYER_ROOT);
+
+/**
+ * Checks if element or its children has any ad preview
+ *
+ * @param {HTMLElement} element
+ * @returns True if container has ad preview
+ */
+const hasPreviewAd = element => (
+  element.hasAttribute(AD_PREVIEW_ATTRIBUTE) || !!element.querySelector(`[${AD_PREVIEW_ATTRIBUTE}]`)
+);
 
 /**
  * Adds frame layer on top elemen
@@ -10,38 +30,22 @@ import AdLayer from '../components/Containers/AdOverlay/AdLayer';
  * @param {HTMLElement} element
  */
 const addFrameLayer = (element) => {
-  if (!element || element.withFrameLayer)
+  if (!element || hasPreviewAd(element))
     return element;
 
-  const frameLayer = document.createElement('div');
+  const uuid = generateUUID('ad-preview');
+  element.setAttribute(AD_PREVIEW_ATTRIBUTE, uuid); // eslint-disable-line no-param-reassign
+  element.style.border = '1px dotted rgba(110, 110, 110, 40%)'; // eslint-disable-line no-param-reassign
+
+  const frameLayer = document.createElement('ad-preview');
   ReactDOM.render(
-    <AdLayer element={element} />,
+    <AdLayer
+      uuid={uuid}
+      element={element}
+    />,
     frameLayer,
   );
-  document.body.appendChild(frameLayer);
-
-  // watch element remove to prevent mem leak
-  const observer = new MutationObserver(
-    R.forEach(
-      (mutation) => {
-        if (mutation.type !== 'childList')
-          return;
-
-        // todo
-        observer.disconnect();
-      },
-    ),
-  );
-
-  observer.observe(element, {
-    childList: true,
-    subtree: true,
-  });
-
-  element.withFrameLayer = true; // eslint-disable-line no-param-reassign
-
-  // add optional styles
-  element.style.filter = 'grayscale(100%)'; // eslint-disable-line no-param-reassign
+  FRAME_LAYER_ROOT.appendChild(frameLayer);
 
   return element;
 };

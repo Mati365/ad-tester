@@ -4,6 +4,7 @@ import c from 'classnames';
 
 import basicInjectSheet from '../../../helpers/basicInjectSheet';
 import ToolbarHeader, {TOOLBAR_HEIGHT} from './ToolbarHeader';
+import ToolbarFooter, {FOOTER_HEIGHT} from './ToolbarFooter';
 
 export {default as ToolbarIcon} from './ToolbarIcon';
 export {TOOLBAR_HEIGHT} from './ToolbarHeader';
@@ -22,15 +23,13 @@ const css = {
   },
   header: {},
   content: {
-    flex: 1,
-    flexShrink: 1,
-    maxHeight: `calc(100% - ${TOOLBAR_HEIGHT}px)`,
+    height: `calc(100% - ${TOOLBAR_HEIGHT + FOOTER_HEIGHT}px)`,
     background: '#fff',
   },
 };
 
 const Toolbar = ({
-  children, className, classes, panel, rightPanel, withRef, ...props
+  children, className, classes, panel, rightPanel, footer, withRef, ...props
 }) => (
   <div
     {...props}
@@ -51,6 +50,11 @@ const Toolbar = ({
         {children}
       </div>
     )}
+    {footer && (
+      <ToolbarFooter>
+        {footer}
+      </ToolbarFooter>
+    )}
   </div>
 );
 
@@ -59,11 +63,13 @@ Toolbar.displayName = 'Toolbar';
 Toolbar.propTypes = {
   panel: PropTypes.node,
   rightPanel: PropTypes.node,
+  footer: PropTypes.node,
 };
 
 Toolbar.defaultProps = {
   panel: null,
   rightPanel: null,
+  footer: null,
 };
 
 export default basicInjectSheet(css)(Toolbar);

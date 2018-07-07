@@ -7,6 +7,7 @@ import * as R from 'ramda';
 import {
   basicInjectSheet,
   replaceAdSlot,
+  toStringDimensions,
 } from '../../../helpers';
 
 import {
@@ -20,17 +21,21 @@ import {
   OutlinedText,
 } from '../../Shared';
 
-import {Actions} from '../../../redux/adModule';
+import {
+  Actions,
+  adCodeSelector,
+} from '../../../redux/adModule';
+
 import AdEdit from './AdEdit';
 
 const getElementDimensions = (element) => {
   const rect = element.getBoundingClientRect();
 
   return {
-    left: rect.left + window.scrollX,
-    top: rect.top + window.scrollY,
-    width: rect.width,
-    height: rect.height,
+    x: rect.left + window.scrollX,
+    y: rect.top + window.scrollY,
+    w: rect.width,
+    h: rect.height,
   };
 };
 
@@ -44,6 +49,7 @@ const getElementDimensions = (element) => {
 const css = {
   adLayer: {
     position: 'absolute',
+    boxSizing: 'border-box',
     zIndex: 9999999,
     background: 'rgba(255, 0, 0, 0.5)',
     border: '2px solid #FF0000',
@@ -57,13 +63,20 @@ const css = {
 @withAppStore
 @assignUID('AD')
 @connect(
-  ({ads: {codes, active}}, {uuid}) => ({
-    code: codes[uuid],
-    editing: active === uuid,
+  ({ads}, {uuid}) => ({
+    code: adCodeSelector(uuid, ads),
+    editing: ads.active === uuid,
   }),
   (dispatch, {uuid}) => ({
     registerAd: () => dispatch(Actions.registerAd(uuid)),
-    focusAd: () => dispatch(Actions.focusAd(uuid)),
+    focusAd: (dimensions) => {
+      dispatch(
+        Actions.focusAd(
+          uuid,
+          {dimensions},
+        ),
+      );
+    },
   }),
 )
 @basicInjectSheet(css)
@@ -105,9 +118,17 @@ export default class AdLayer extends React.PureComponent {
   }
 
   onResize = () => {
+    const dimensions = getElementDimensions(this.element);
+    if (this.props.editing)
+      this.onFocus();
+
     this.setState({
-      dimensions: getElementDimensions(this.element),
+      dimensions,
     });
+  };
+
+  onFocus = () => {
+    this.props.focusAd(this.state.dimensions);
   };
 
   injectCode() {
@@ -117,44 +138,41 @@ export default class AdLayer extends React.PureComponent {
 
   render() {
     const {
-      classes, className, style,
-      focusAd, editing,
+      classes, className, style, editing,
     } = this.props;
 
     const {dimensions} = this.state;
+    if (dimensions.h * dimensions.w === 0 || dimensions.h < 10 || editing)
+      return null;
+
     const editBtn = (
       <AdEdit
-        titled={dimensions.width >= 150}
+        titled={
+          dimensions.w >= 150
+        }
         editing={editing}
-        onClick={focusAd}
+        onClick={this.onFocus}
       />
     );
 
-    let content = null;
-
-    if (dimensions.height * dimensions.width === 0 || editing)
-      return null;
-
-    if (!editing) {
-      content = (
-        <CenteredLayer>
-          {editBtn}
-          <OutlinedText
-            style={{
-              fontSize: 12,
-              textAlign: 'center',
-            }}
-          >
-            {dimensions.height >= 120 && (
-              <div style={{marginBottom: 2}}>
-                {chrome.i18n.getMessage('ad_creation_dimensions')}
-              </div>
-            )}
-            {`${Number.parseInt(dimensions.width, 10)}px : ${Number.parseInt(dimensions.height, 10)}px`}
-          </OutlinedText>
-        </CenteredLayer>
-      );
-    }
+    const content = (
+      <CenteredLayer>
+        {editBtn}
+        <OutlinedText
+          style={{
+            fontSize: 12,
+            textAlign: 'center',
+          }}
+        >
+          {dimensions.h >= 120 && (
+            <div style={{marginBottom: 2}}>
+              {chrome.i18n.getMessage('ad_creation_dimensions')}
+            </div>
+          )}
+          {toStringDimensions(dimensions)}
+        </OutlinedText>
+      </CenteredLayer>
+    );
 
     return (
       <WatchWindowResize onResize={this.onResize}>
@@ -166,7 +184,10 @@ export default class AdLayer extends React.PureComponent {
           )}
           style={{
             ...style,
-            ...dimensions,
+            left: dimensions.x,
+            top: dimensions.y,
+            width: dimensions.w,
+            height: dimensions.h,
           }}
         >
           {content}
