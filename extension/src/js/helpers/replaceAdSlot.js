@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-import {AD_REPLACED_ATTRIBUTE} from '../constants';
+import setFrameContent from './setFrameContent';
 
 const wrapWithHTMLSkel = (code, headTags = '') => `
   <html>
@@ -83,6 +83,9 @@ const replaceAdSlot = (selector, code, styles = {}) => {
         margin: 0,
         border: '1px dashed rgba(0, 0, 0, 0.45)',
       },
+      {
+        'data-ad-preview': true,
+      },
     );
   }
 
@@ -91,30 +94,27 @@ const replaceAdSlot = (selector, code, styles = {}) => {
     parent.removeChild(element);
   }
 
-  // kill all previous requests
-  frame.srcdoc = '';
-
-  // wait until all requests are killed
-  setTimeout(
-    () => {
-      frame.setAttribute(AD_REPLACED_ATTRIBUTE, true);
-      frame.srcdoc = wrapWithHTMLSkel(
-        code,
-        `
-          <style>
-            html, body {
-              overflow: hidden;
-              width: ${element.offsetWidth}px;
-              height: ${element.offsetHeight}px;
-            }
-          </style>
-        `,
-      );
-    },
-    60,
+  /**
+   * Wraps provided code with basic
+   * html skeleton
+   */
+  const html = wrapWithHTMLSkel(
+    code,
+    `
+      <style>
+        html, body {
+          overflow: hidden;
+          width: ${element.offsetWidth}px;
+          height: ${element.offsetHeight}px;
+        }
+      </style>
+    `,
   );
 
-  return frame;
+  return {
+    detailsPromise: setFrameContent(html, frame),
+    element,
+  };
 };
 
 export default replaceAdSlot;

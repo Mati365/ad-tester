@@ -34,8 +34,8 @@ const addFrameLayer = (element) => {
     return element;
 
   const uuid = generateUUID('ad-preview');
-  element.setAttribute(AD_PREVIEW_ATTRIBUTE, uuid); // eslint-disable-line no-param-reassign
-  element.style.border = '1px dotted rgba(110, 110, 110, 40%)'; // eslint-disable-line no-param-reassign
+  element.setAttribute(AD_PREVIEW_ATTRIBUTE, uuid);
+  element.style.border = '1px dotted rgba(110, 110, 110, 40%)';
 
   const frameLayer = document.createElement('ad-preview');
   ReactDOM.render(

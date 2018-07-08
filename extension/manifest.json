@@ -32,6 +32,7 @@
     "webRequest",
     "webRequestBlocking",
     "webNavigation",
+    "browsingData",
     "<all_urls>"
   ]
 }

@@ -11,6 +11,7 @@ const PullAlign = ({
     {...props}
     style={{
       ...style,
+      display: 'inherit',
       [direction === 'right' ? 'marginLeft' : 'marginRight']: 'auto',
       float: direction, // fallback only
     }}

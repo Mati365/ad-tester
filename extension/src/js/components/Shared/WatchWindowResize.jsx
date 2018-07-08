@@ -37,7 +37,7 @@ export default class WatchWindowResize extends React.Component {
   constructor(props) {
     super(props);
     this.onScroll = props.throttleScroll
-      ? throttle(200, this.onResize)
+      ? throttle(250, this.onResize)
       : this.onResize;
   }
 

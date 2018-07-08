@@ -8,6 +8,7 @@ import {
   basicInjectSheet,
   replaceAdSlot,
   toStringDimensions,
+  throttle,
 } from '../../../helpers';
 
 import {
@@ -68,6 +69,7 @@ const css = {
     editing: ads.active === uuid,
   }),
   (dispatch, {uuid}) => ({
+    editAd: (...args) => dispatch(Actions.editAd(uuid, ...args)),
     registerAd: () => dispatch(Actions.registerAd(uuid)),
     focusAd: (dimensions) => {
       dispatch(
@@ -97,6 +99,15 @@ export default class AdLayer extends React.PureComponent {
     this.state = {
       dimensions: getElementDimensions(this.element),
     };
+
+    const throttledInject = throttle(
+      200, this.injectCode,
+    );
+
+    this.injectCode = () => {
+      this.element.srcdoc = '';
+      throttledInject();
+    };
   }
 
   componentDidMount() {
@@ -119,6 +130,9 @@ export default class AdLayer extends React.PureComponent {
 
   onResize = () => {
     const dimensions = getElementDimensions(this.element);
+    if (R.equals(dimensions, this.state.dimensions))
+      return;
+
     if (this.props.editing)
       this.onFocus();
 
@@ -131,9 +145,22 @@ export default class AdLayer extends React.PureComponent {
     this.props.focusAd(this.state.dimensions);
   };
 
-  injectCode() {
-    this.element = replaceAdSlot(this.element, this.props.code);
+  injectCode = () => {
+    const {
+      detailsPromise,
+      element,
+    } = replaceAdSlot(this.element, this.props.code);
+
+    this.element = element;
     this.onResize();
+
+    if (detailsPromise) {
+      detailsPromise.then((details) => {
+        this.props.editAd({
+          details,
+        });
+      });
+    }
   }
 
   render() {

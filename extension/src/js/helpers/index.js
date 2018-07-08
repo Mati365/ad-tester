@@ -7,3 +7,6 @@ export {default as argReferenceMemoize} from './argReferenceMemoize';
 export {default as hasFlag} from './hasFlag';
 export {default as toStringDimensions} from './toStringDimensions';
 export {default as generateUUID} from './generateUUID';
+export {default as setFrameContent} from './setFrameContent';
+export {default as pickContentLength} from './pickContentLength';
+export {default as throttle} from './throttle';
