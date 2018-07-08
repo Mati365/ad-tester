@@ -1,6 +1,10 @@
 # AD Tester
 Simple chrome extension that helps with AD development. Allows user to live reload AD content inside slot.
 
+## Screens
+![Layer](docs/screens/layer.png?raw=true "Layer")
+![Toolbar](docs/screens/toolbar.png?raw=true "Toolbar")
+
 ## Extension license
 The MIT License (MIT)
 
@@ -14,6 +18,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ### Icons credits
 Icons made by
-[eucalyp](https://www.flaticon.com/authors/eucalyp)<br />
-[google](https://www.flaticon.com/authors/google)<br />
+[eucalyp](https://www.flaticon.com/authors/eucalyp)
+[google](https://www.flaticon.com/authors/google)
 from www.flaticon.com

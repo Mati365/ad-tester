@@ -3,6 +3,7 @@ import c from 'classnames';
 
 import {basicInjectSheet} from '../../helpers';
 import ExposedIcon from './ExposedIcon';
+import FlexColumn from './FlexColumn';
 
 const css = {
   groupIcon: {
@@ -14,7 +15,7 @@ const IconGroup = ({
   children, className, classes,
   ...props
 }) => (
-  <>
+  <FlexColumn>
     <ExposedIcon
       {...props}
       className={c(
@@ -25,7 +26,7 @@ const IconGroup = ({
     <span>
       {children}
     </span>
-  </>
+  </FlexColumn>
 );
 
 IconGroup.displayName = 'IconGroup';

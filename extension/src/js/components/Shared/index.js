@@ -5,5 +5,8 @@ export {default as PullAlign} from './PullAlign';
 export {default as Toolbar} from './Toolbar';
 export {default as ExposedIcon} from './ExposedIcon';
 export {default as IconGroup} from './IconGroup';
+export {default as CheckboxGroup} from './CheckboxGroup';
 export {default as Resizable} from './Resizable';
 export {default as WatchWindowResize} from './WatchWindowResize';
+export {default as Button} from './Button';
+export {default as FlexColumn} from './FlexColumn';

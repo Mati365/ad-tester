@@ -146,10 +146,11 @@ export default class AdLayer extends React.PureComponent {
   };
 
   injectCode = () => {
+    const {code} = this.props;
     const {
       detailsPromise,
       element,
-    } = replaceAdSlot(this.element, this.props.code);
+    } = replaceAdSlot(this.element, code);
 
     this.element = element;
     this.onResize();
@@ -157,7 +158,10 @@ export default class AdLayer extends React.PureComponent {
     if (detailsPromise) {
       detailsPromise.then((details) => {
         this.props.editAd({
-          details,
+          details: details && {
+            ...details,
+            size: details.size + code.length,
+          },
         });
       });
     }

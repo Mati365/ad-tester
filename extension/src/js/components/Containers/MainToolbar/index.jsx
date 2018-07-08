@@ -31,7 +31,7 @@ import EditorFooter from './EditorFooter';
 
 const getInitialDimensions = R.once(() => {
   const [w, h] = [
-    window.innerWidth * 0.4,
+    630,
     TOOLBAR_HEIGHT + 150,
   ];
 
@@ -82,6 +82,12 @@ export default class ToggleableToolbar extends React.PureComponent {
     ad: AD_SCHEMA.isRequired,
   };
 
+  state = {
+    liveReload: true,
+    bufferedCode: null,
+    prevUUID: null,
+  };
+
   componentDidUpdate(prevProps) {
     if (prevProps.activeUUID !== this.props.activeUUID)
       this.onFocusInput();
@@ -122,12 +128,42 @@ export default class ToggleableToolbar extends React.PureComponent {
   };
 
   onEditAd = (newCode) => {
+    if (this.state.liveReload) {
+      this.props.editAd(
+        this.props.activeUUID,
+        {
+          code: newCode,
+        },
+      );
+    } else {
+      this.setState({
+        bufferedCode: newCode,
+      });
+    }
+  };
+
+  onChangeLiveReload = (liveReload) => {
+    this.setState({
+      liveReload,
+      bufferedCode: (
+        liveReload
+          ? this.props.ad.code
+          : null
+      ),
+    });
+  }
+
+  onPreview = () => {
     this.props.editAd(
       this.props.activeUUID,
       {
-        code: newCode,
+        code: this.state.bufferedCode,
       },
     );
+
+    this.setState({
+      bufferedCode: null,
+    });
   };
 
   get minimized() {
@@ -135,8 +171,20 @@ export default class ToggleableToolbar extends React.PureComponent {
     return !dimensions || dimensions.h <= TOOLBAR_HEIGHT;
   }
 
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (prevState.prevUUID !== nextProps.activeUUID) {
+      return {
+        prevUUID: nextProps.activeUUID,
+        bufferedCode: null,
+      };
+    }
+
+    return null;
+  }
+
   render() {
     const {minimized} = this;
+    const {liveReload} = this.state;
     const {
       dimensions, resizing, handles, withRef,
       sticky, ad, blurAd,
@@ -145,6 +193,8 @@ export default class ToggleableToolbar extends React.PureComponent {
 
     let content = null;
     if (!minimized) {
+      const code = R.defaultTo(ad.code, this.state.bufferedCode);
+
       content = (
         resizing
           ? (
@@ -161,7 +211,7 @@ export default class ToggleableToolbar extends React.PureComponent {
           : (
             <AdEditor
               withRef={this.editorRef}
-              value={ad.code}
+              value={code}
               onChange={this.onEditAd}
               onEditorLoaded={this.onFocusInput}
             />
@@ -232,7 +282,11 @@ export default class ToggleableToolbar extends React.PureComponent {
             </>
           )}
           footer={!minimized && (
-            <EditorFooter ad={ad} />
+            <EditorFooter
+              {...{ad, liveReload}}
+              onChangeLiveReload={this.onChangeLiveReload}
+              onPreview={this.onPreview}
+            />
           )}
         >
           {content}

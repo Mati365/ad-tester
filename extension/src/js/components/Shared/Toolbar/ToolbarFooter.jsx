@@ -10,6 +10,7 @@ const css = {
   toolbarFooter: {
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'space-between',
     height: FOOTER_HEIGHT,
     padding: '0 7px',
     fontSize: 11,

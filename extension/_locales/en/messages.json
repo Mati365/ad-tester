@@ -5,5 +5,9 @@
   },
   "ad_creation_dimensions": {"message": "AD dimensions:"},
   "edit_ad": {"message": "Click to change AD content"},
-  "editing_ad": {"message": "Editing AD"}
+  "editing_ad": {"message": "Editing AD"},
+  "preview_ad": {"message": "Preview"},
+  "requests": {"message": "requests"},
+  "live_preview": {"message": "live preview"},
+  "page_reload_preview": {"message": "reload on change"}
 }
