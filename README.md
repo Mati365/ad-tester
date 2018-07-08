@@ -2,8 +2,8 @@
 Simple chrome extension that helps with AD development. Allows user to live reload AD content inside slot.
 
 ## Screens
-![Layer](docs/screens/layer.png?raw=true "Layer")
-![Toolbar](docs/screens/toolbar.png?raw=true "Toolbar")
+![Layer](doc/screens/layer.png?raw=true "Layer")
+![Toolbar](doc/screens/toolbar.png?raw=true "Toolbar")
 
 ## Extension license
 The MIT License (MIT)
