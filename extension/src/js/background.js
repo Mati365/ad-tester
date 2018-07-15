@@ -4,7 +4,6 @@ import cacheCall from './helpers/cacheCall';
 import pickContentLength from './helpers/pickContentLength';
 
 import {
-  EXTENSION_ALLOWED_URLS,
   MAGIC_START_TRACKING_FRAME_URL,
   EXTENSION_CACHE_BUSTER,
 } from './constants';
@@ -260,7 +259,7 @@ if (isBackgroundScript) {
       };
     },
     {
-      urls: EXTENSION_ALLOWED_URLS,
+      urls: ['<all_urls>'],
     },
     ['blocking'],
   );
@@ -268,7 +267,7 @@ if (isBackgroundScript) {
   chrome.webRequest.onHeadersReceived.addListener(
     interceptFrameRequests,
     {
-      urls: EXTENSION_ALLOWED_URLS,
+      urls: ['<all_urls>'],
     },
     ['responseHeaders'],
   );

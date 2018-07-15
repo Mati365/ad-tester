@@ -101,15 +101,20 @@ const replaceAdSlot = (selector, code, styles = {}) => {
    * Wraps provided code with basic
    * html skeleton
    */
+  const emptyCode = R.pipe(
+    R.trim,
+    R.isEmpty,
+  )(code);
+
   const html = wrapWithHTMLSkel(
     code,
     `
       <style>
         html, body {
           overflow: hidden;
-          border: 1px dotted gray;
           width: ${element.offsetWidth}px;
           height: ${element.offsetHeight}px;
+          ${emptyCode ? 'background: rgba(0, 0, 0, 0.03);' : ''}
         }
       </style>
     `,
