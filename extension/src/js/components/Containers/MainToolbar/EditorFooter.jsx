@@ -96,14 +96,6 @@ const EditorFooter = ({
           {chrome.i18n.getMessage('live_preview')}
         </CheckboxGroup>
 
-        <CheckboxGroup
-          style={{
-            marginRight: 10,
-          }}
-        >
-          {chrome.i18n.getMessage('page_reload_preview')}
-        </CheckboxGroup>
-
         <Button
           disabled={liveReload}
           onClick={onPreview}

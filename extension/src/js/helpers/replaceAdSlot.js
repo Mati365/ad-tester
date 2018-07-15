@@ -1,14 +1,16 @@
 import * as R from 'ramda';
 
+import {MAGIC_START_TRACKING_FRAME_URL} from '../constants';
 import setFrameContent from './setFrameContent';
 
-const wrapWithHTMLSkel = (code, headTags = '') => `
+const wrapWithHTMLSkel = (code, headTags = '', tags = '') => `
   <html>
     <head>
       <title>AD PREVIEW</title>
       <meta charset="UTF-8" />
       <style>
         body, html {
+          box-sizing: border-box;
           margin: 0;
           padding: 0;
         }
@@ -17,6 +19,7 @@ const wrapWithHTMLSkel = (code, headTags = '') => `
     </head>
 
     <body>
+      ${tags}
       ${code}
     </body>
   </html>
@@ -104,10 +107,17 @@ const replaceAdSlot = (selector, code, styles = {}) => {
       <style>
         html, body {
           overflow: hidden;
+          border: 1px dotted gray;
           width: ${element.offsetWidth}px;
           height: ${element.offsetHeight}px;
         }
       </style>
+    `,
+    `
+      <img
+        src='${MAGIC_START_TRACKING_FRAME_URL}'
+        style='position: fixed;left: -1111px;top: -1111px;width: 1px;height:1px;opacity:0'
+      ></img>
     `,
   );
 

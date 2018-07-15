@@ -31,7 +31,7 @@ import EditorFooter from './EditorFooter';
 
 const getInitialDimensions = R.once(() => {
   const [w, h] = [
-    630,
+    500,
     TOOLBAR_HEIGHT + 150,
   ];
 
@@ -127,8 +127,8 @@ export default class ToggleableToolbar extends React.PureComponent {
       textField.focus();
   };
 
-  onEditAd = (newCode) => {
-    if (this.state.liveReload) {
+  onEditAd = (newCode, noBuffer = false) => {
+    if (this.state.liveReload || noBuffer) {
       this.props.editAd(
         this.props.activeUUID,
         {
@@ -145,11 +145,6 @@ export default class ToggleableToolbar extends React.PureComponent {
   onChangeLiveReload = (liveReload) => {
     this.setState({
       liveReload,
-      bufferedCode: (
-        liveReload
-          ? this.props.ad.code
-          : null
-      ),
     });
   }
 
@@ -157,7 +152,10 @@ export default class ToggleableToolbar extends React.PureComponent {
     this.props.editAd(
       this.props.activeUUID,
       {
-        code: this.state.bufferedCode,
+        code: R.defaultTo(
+          this.props.ad.code,
+          this.state.bufferedCode,
+        ),
       },
     );
 

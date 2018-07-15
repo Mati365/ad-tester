@@ -3,7 +3,11 @@ import * as R from 'ramda';
 import cacheCall from './helpers/cacheCall';
 import pickContentLength from './helpers/pickContentLength';
 
-import {IFRAME_ANALYZE_ATTRIBUTE} from './constants';
+import {
+  EXTENSION_ALLOWED_URLS,
+  MAGIC_START_TRACKING_FRAME_URL,
+  EXTENSION_CACHE_BUSTER,
+} from './constants';
 
 const isBackgroundScript = R.is(
   Function,
@@ -123,8 +127,6 @@ export const setBadgeBackgroundColor = R.compose(
  * single global variable only allows to watch single slot,
  * storing it in array will cause mem leak sometimes
  */
-let analyzedFrame = null;
-
 const initResAnalyze = () => ({
   totalRequests: 0,
   size: 0,
@@ -132,6 +134,7 @@ const initResAnalyze = () => ({
 
 const initBlankFrameAnalyze = id => ({
   id,
+  frameId: null,
   ...initResAnalyze(),
   details: {
     image: initResAnalyze(),
@@ -164,6 +167,8 @@ const killBrowserCache = () => {
       );
   });
 };
+
+let analyzedFrame = null;
 
 export const runOnAnalyzeIdle = Backend.registerAction(
   'runOnAnalyzeIdle',
@@ -215,50 +220,14 @@ if (isBackgroundScript) {
     };
   };
 
-  const isPreviewFrameID = cacheCall(
-    (tabId, frameId) => new Promise((resolve) => {
-      if (tabId < 0 || frameId < 0) {
-        resolve(null);
-        return;
-      }
-
-      try {
-        chrome.tabs.executeScript(
-          tabId,
-          {
-            frameId,
-            code: `(function() {
-              var frame = window.frameElement;
-              if (!frame)
-                return null;
-
-              return frame.getAttribute("${IFRAME_ANALYZE_ATTRIBUTE}");
-            })();`,
-            matchAboutBlank: true,
-          },
-          result => resolve(result && result[0]),
-        );
-      } catch (e) {
-        resolve(null);
-      }
-    }),
-  );
-
   /**
    * Checks if frame that requested resource contains
    * analyze attriute, if true - check its size
    *
    * @param {Object}  event
    */
-  const interceptFrameRequests = async (e) => {
-    if (!analyzedFrame || e.frameId <= 0)
-      return;
-
-    const analyzedId = await isPreviewFrameID(
-      e.tabId,
-      e.frameId,
-    );
-    if (!analyzedId)
+  const interceptFrameRequests = (e) => {
+    if (R.isNil(analyzedFrame) || analyzedFrame.frameId !== e.frameId)
       return;
 
     const size = pickContentLength(e.responseHeaders);
@@ -269,10 +238,37 @@ if (isBackgroundScript) {
     );
   };
 
+  chrome.webRequest.onBeforeRequest.addListener(
+    (e) => {
+      if (!analyzedFrame || R.contains(EXTENSION_CACHE_BUSTER, e.url))
+        return {};
+
+      if (R.contains(MAGIC_START_TRACKING_FRAME_URL, e.url)) {
+        analyzedFrame.frameId = e.frameId;
+        return {
+          cancel: true,
+        };
+      }
+
+      if (analyzedFrame.frameId !== e.frameId)
+        return {};
+
+      const url = new URL(e.url);
+      url.searchParams.set(EXTENSION_CACHE_BUSTER, Date.now());
+      return {
+        redirectUrl: url.toString(),
+      };
+    },
+    {
+      urls: EXTENSION_ALLOWED_URLS,
+    },
+    ['blocking'],
+  );
+
   chrome.webRequest.onHeadersReceived.addListener(
     interceptFrameRequests,
     {
-      urls: ['<all_urls>'],
+      urls: EXTENSION_ALLOWED_URLS,
     },
     ['responseHeaders'],
   );

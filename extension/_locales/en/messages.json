@@ -8,6 +8,5 @@
   "editing_ad": {"message": "Editing AD"},
   "preview_ad": {"message": "Preview"},
   "requests": {"message": "requests"},
-  "live_preview": {"message": "live preview"},
-  "page_reload_preview": {"message": "reload on change"}
+  "live_preview": {"message": "live preview"}
 }

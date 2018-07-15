@@ -1,7 +1,5 @@
 import * as R from 'ramda';
 
-import {IFRAME_ANALYZE_ATTRIBUTE} from '../constants';
-
 import * as backend from '../background';
 import generateUUID from './generateUUID';
 
@@ -22,11 +20,8 @@ const setFrameContent = R.curry(
     await backend.startFrameAnalyze(analyzeUUID);
     await backend.runOnAnalyzeIdle();
 
-    frame.setAttribute(IFRAME_ANALYZE_ATTRIBUTE, analyzeUUID);
     frame.srcdoc = code;
     frame.onload = () => {
-      frame.removeAttribute(IFRAME_ANALYZE_ATTRIBUTE);
-
       setTimeout(
         () => {
           backend
