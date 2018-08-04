@@ -10,7 +10,7 @@ import * as backend from './background';
 
 const formatFramesArray = R.compose(
   R.cond([
-    [R.equals(0), R.always('')],
+    [R.equals(0), R.always('-')],
     [R.lt(99), R.always('99+')],
     [R.T, R.identity],
   ]),
@@ -42,15 +42,22 @@ const updateFramesMiddleware = () => {
   );
 };
 
-setInterval(updateFramesMiddleware, 2000);
-updateFramesMiddleware();
+(async () => {
+  if (await backend.isExtensionEnabled()) {
+    setInterval(updateFramesMiddleware, 2000);
+    updateFramesMiddleware();
 
-/**
- * Display toolbar panel
- */
-const toolbarContainer = document.createElement('div');
-ReactDOM.render(
-  <MainToolbar />,
-  toolbarContainer,
-);
-document.body.appendChild(toolbarContainer);
+    /**
+     * Display toolbar panel
+     */
+    const toolbarContainer = document.createElement('div');
+    ReactDOM.render(
+      <MainToolbar />,
+      toolbarContainer,
+    );
+    document.body.appendChild(toolbarContainer);
+    return;
+  }
+  await backend.setBadgeBackgroundColor('gray');
+  backend.setBadgeText('off');
+})();

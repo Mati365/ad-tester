@@ -8,6 +8,7 @@ const OutlinedText = styled(
       fontSize: 12,
       color: '#fff',
       textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000',
+      '-webkit-font-smoothing': 'initial',
     },
   },
 );

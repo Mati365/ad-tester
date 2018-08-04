@@ -17,7 +17,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*/*adEditor*"],
+      "matches": ["*://*/*"],
       "js": ["js/content.js"],
       "run_at": "document_idle"
     }
@@ -33,6 +33,6 @@
     "webRequestBlocking",
     "webNavigation",
     "browsingData",
-    "*://*/*adEditor*"
+    "*://*/*"
   ]
 }

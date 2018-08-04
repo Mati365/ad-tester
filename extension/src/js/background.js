@@ -168,6 +168,12 @@ const killBrowserCache = () => {
 };
 
 let analyzedFrame = null;
+let extensionEnabled = false;
+
+export const isExtensionEnabled = Backend.registerAction(
+  'isExtensionEnabled',
+  () => extensionEnabled,
+);
 
 export const runOnAnalyzeIdle = Backend.registerAction(
   'runOnAnalyzeIdle',
@@ -236,6 +242,13 @@ if (isBackgroundScript) {
       analyzedFrame,
     );
   };
+
+  chrome.browserAction.onClicked.addListener(
+    (tab) => {
+      extensionEnabled = !extensionEnabled;
+      chrome.tabs.reload(tab.id);
+    },
+  );
 
   chrome.webRequest.onBeforeRequest.addListener(
     (e) => {
