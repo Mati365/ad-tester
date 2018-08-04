@@ -1,6 +1,9 @@
 # AD Tester
 Simple chrome extension that helps with AD development. Allows user to live reload AD content inside slot.
 
+**Web store URL:**
+https://chrome.google.com/webstore/detail/ads-tester/flcbcdpbcpmmnlhkbbcgmmdmpeonccdo
+
 ## Screens
 ![Layer](doc/screens/layer.png?raw=true "Layer")
 ![Toolbar](doc/screens/toolbar.png?raw=true "Toolbar")
